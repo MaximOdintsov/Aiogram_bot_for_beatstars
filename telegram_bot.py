@@ -20,6 +20,7 @@ from database import *
 bot = telebot.TeleBot(TOKEN)
 
 
+
 class BeatstarsBot:
     """Класс работы бота"""
 
@@ -33,6 +34,7 @@ class BeatstarsBot:
         self.sleep_day_cycle = None
         self.number = None
 
+
         self.browser = None
         print(Fore.LIGHTMAGENTA_EX, 'БОТ НАЧАЛ СВОЮ РАБОТУ')
 
@@ -41,7 +43,12 @@ class BeatstarsBot:
 
         try:
             bot.send_message(message.chat.id, "Привет! Захожу в браузер, подождите...")
-            self.browser = webdriver.Firefox()
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--no-sandbox")
+            self.browser = webdriver.Chrome()
             self.browser.get('https://oauth.beatstars.com/')
             bot.send_message(message.chat.id, "Страница загружена!")
             time.sleep(random.randrange(5, 15))

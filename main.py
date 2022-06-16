@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from colorama import Fore, Back
-
+import os
 import time
 import random
 
@@ -28,7 +28,12 @@ class BeatstarsBot:
 
         self.username = log
         self.password = pas
-        self.browser = webdriver.Firefox()
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+        self.browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         print(Fore.LIGHTMAGENTA_EX, 'БОТ НАЧАЛ СВОЮ РАБОТУ')
 
     def oauth_beatstars(self):
