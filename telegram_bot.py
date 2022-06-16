@@ -48,7 +48,8 @@ class BeatstarsBot:
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
-            self.browser = webdriver.Chrome()
+            self.browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),
+                                            chrome_options=chrome_options)
             self.browser.get('https://oauth.beatstars.com/')
             bot.send_message(message.chat.id, "Страница загружена!")
             time.sleep(random.randrange(5, 15))
@@ -125,7 +126,7 @@ class BeatstarsBot:
                                       'Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если да, то следуй инструкции дальше, если нет, то отправь боту "0"')
             bot.register_next_step_handler(code_1, self.first_code_input)
         except Exception as ex:
-            print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
+            bot.send_message(message.chat.id, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
             time.sleep(random.randrange(5, 10))
             self.homepage(message)
