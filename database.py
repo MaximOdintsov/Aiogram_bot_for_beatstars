@@ -13,3 +13,5 @@ username1 = 'flipsud'
 password1 = 'vevahu51'
 
 
+# self.browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),
+#                                             chrome_options=chrome_options)

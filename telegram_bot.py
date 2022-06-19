@@ -4,7 +4,7 @@ import telebot
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-# from flask import Flask
+from flask import Flask
 
 from colorama import Fore
 
@@ -14,10 +14,11 @@ import random
 from comments import list_comments
 from database import *
 
-# bot = telebot.TeleBot(TOKEN)
-
 bot = telebot.TeleBot(TOKEN)
+server = Flask(__name__)
 
+if __name__ == 'main':
+    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
 class BeatstarsBot:
@@ -47,8 +48,7 @@ class BeatstarsBot:
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
-            self.browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),
-                                            chrome_options=chrome_options)
+            self.browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
             self.browser.get('https://oauth.beatstars.com/')
             bot.send_message(message.chat.id, "Страница загружена!")
             time.sleep(random.randrange(5, 15))
