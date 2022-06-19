@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from flask import Flask, request
 from colorama import Fore, Back
 import os
 import time
@@ -11,6 +12,11 @@ from database import *
 # from threading import Thread
 # from selenium.webdriver.common.keys import Keys
 # from database import username, password, username2, password2
+
+server = Flask(__name__)
+
+if __name__ == 'main':
+    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
 class BeatstarsBot:
