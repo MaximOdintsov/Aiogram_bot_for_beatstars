@@ -109,8 +109,8 @@ class BeatstarsBot:
                                                      '/html/body/oauth-root/ng-component/section/div[2]/div[2]/form/bs-square-button/button')
             login_button.click()
             bot.send_message(message.chat.id, "Нажал на кнопку войти. Пожалуйста, подождите...")
-
-            self.consent_to_cookies(message)
+            time.sleep(random.randrange(30, 40))
+            bot.send_message(message.chat.id, "Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если да, то /code, если нет, то /cookie ")
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось нажать на кнопку "Войти", запускаю алгоритм заново')
             print(ex)
@@ -238,9 +238,10 @@ class BeatstarsBot:
             time.sleep(random.randrange(2, 4))
 
         except Exception as ex:
-            bot.send_message(message.chat.id, "Не получилось согласиться с куки. Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если ДА, то /code, если НЕТ, то /cookie")
+            bot.send_message(message.chat.id, "Не получилось согласиться с куки, пробую еще раз")
             print(ex)
-            time.sleep(random.randrange(5, 10))
+            time.sleep(random.randrange(15, 20))
+            self.consent_to_cookies()
 
 
     def homepage(self, message):
