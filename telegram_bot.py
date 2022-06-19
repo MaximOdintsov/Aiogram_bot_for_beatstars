@@ -121,10 +121,8 @@ class BeatstarsBot:
         """Переводит на функцию ввода 1 цифры кода подтверждения"""
 
         try:
-            code_1 = bot.send_message(message.chat.id,
-                                      'Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если да, то следуй инструкции дальше, если нет, то отправь боту "0"')
+            code_1 = bot.send_message(message.chat.id, 'Введите первую цифру кода подтверждения')
             bot.register_next_step_handler(code_1, self.first_code_input)
-            self.first_code_input(message)  #######
 
         except Exception as ex:
             bot.send_message(message.chat.id, 'Не получилось ввести код верификации, открываю эту страницу заново')
@@ -136,11 +134,11 @@ class BeatstarsBot:
         """Вводит 1 цифру кода подтверждения"""
 
         try:
-            bot.send_message(message.chat.id, "Введите первую цифру кода подтверждения")
             confirmation_code_1 = self.browser.find_element(By.XPATH,
                                                             '/html/body/div[2]/div[2]/div/mat-dialog-container/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
             confirmation_code_1.click()
             confirmation_code_1.send_keys(message.text)
+            bot.send_message(message.chat.id, "Ввёл первую цифру кода подтверждения!")
             self.second_code(message)
 
         except Exception as ex:
@@ -240,10 +238,10 @@ class BeatstarsBot:
             time.sleep(random.randrange(2, 4))
 
         except Exception as ex:
-            bot.send_message(message.chat.id, "Не получилось согласиться с куки, пробую ввести код подтверждения!")
+            bot.send_message(message.chat.id, "Не получилось согласиться с куки. Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если ДА, то /code, если НЕТ, то /cookie")
             print(ex)
             time.sleep(random.randrange(5, 10))
-            self.first_code(message)
+
 
     def homepage(self, message):
         """Открывает начальную страницу битстарс"""
@@ -529,6 +527,11 @@ class BeatstarsBot:
             print(Fore.RED, 'Описание ошибки: ', ex)
             time.sleep(10)
 
+    def stop_bot(self, message):
+        self.browser.close()
+        self.browser.quit()
+        bot.send_message(message.chat.id, 'Бот закрыл браузер')
+
     def start_bot(self, message):
         """Запускает бота в цикл"""
         try:
@@ -554,7 +557,7 @@ class BeatstarsBot:
                         for i in range(0, random.randrange(9, 21)):  # 10-16
                             """Сам цикл, выполняется 4-7 раз за 1 цикл"""
 
-                            bot.send_message(message.chat.id, 'Цикл начал свою работу!')  # i + 1
+                            bot.send_message(message.chat.id, 'Начался новый цикл!')  # i + 1
                             self.open_feed()
                             bot.send_message(message.chat.id, 'Цикл успешно завершён! Продолжаем..')
                             time.sleep(random.randrange(5, 15))
@@ -602,6 +605,16 @@ def start_bot(message):
 @bot.message_handler(commands=['code'])  # вводит первую цифру кода подтверждения
 def code(message):
     BS_bot.first_code(message)
+
+
+@bot.message_handler(commands=['cookie'])  # соглашается с куки
+def cookie(message):
+    BS_bot.consent_to_cookies(message)
+
+
+@bot.message_handler(commands=['stop'])  # останавливает работу бота
+def code(message):
+    BS_bot.stop_bot(message)
 
 
 @bot.message_handler(content_types=['text'])
