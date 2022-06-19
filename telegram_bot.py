@@ -15,10 +15,10 @@ from comments import list_comments
 from database import *
 
 bot = telebot.TeleBot(TOKEN)
-server = Flask(__name__)
-
-if __name__ == 'main':
-    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+# server = Flask(__name__)
+#
+# if __name__ == 'main':
+#     server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
 class BeatstarsBot:
