@@ -33,8 +33,6 @@ class BeatstarsBot:
         self.sleep_1_cycle = None
         self.sleep_day_cycle = None
         self.number = None
-
-
         self.browser = None
         print(Fore.LIGHTMAGENTA_EX, 'БОТ НАЧАЛ СВОЮ РАБОТУ')
 
@@ -48,7 +46,7 @@ class BeatstarsBot:
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
-            self.browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+            self.browser = webdriver.Chrome()
             self.browser.get('https://oauth.beatstars.com/')
             bot.send_message(message.chat.id, "Страница загружена!")
             time.sleep(random.randrange(5, 15))
@@ -128,14 +126,13 @@ class BeatstarsBot:
             bot.send_message(message.chat.id, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
             time.sleep(random.randrange(5, 10))
-            self.homepage(message)
 
     def first_code_input(self, message):
         """Вводит 1 цифру кода подтверждения"""
 
         try:
-            confirmation_code_1 = self.browser.find_element(By.XPATH,
-                                                            '/html/body/div[2]/div[2]/div/mat-dialog-container/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
+            confirmation_code_1 = self.browser.find_element(By.CSS_SELECTOR,
+                                                            '#mat-dialog-0 > ng-component > bs-dialog > div.body-container > div > bs-code-input > form > div > input.ng-pristine.ng-valid.ng-star-inserted.ng-touched')
             confirmation_code_1.click()
             confirmation_code_1.send_keys(message.text)
             bot.send_message(message.chat.id, "Ввёл первую цифру кода подтверждения!")
@@ -144,7 +141,6 @@ class BeatstarsBot:
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            self.homepage(message)
 
     def second_code(self, message):
         """Переводит на функцию ввода 2 цифры кода подтверждения"""
@@ -155,22 +151,19 @@ class BeatstarsBot:
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            time.sleep(random.randrange(5, 10))
-            self.homepage(message)
 
     def second_code_input(self, message):
         """Вводит 2 цифру кода подтверждения"""
 
         try:
-            confirmation_code_2 = self.browser.find_element(By.XPATH,
-                                                            '/html/body/div[2]/div[2]/div/mat-dialog-container/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[4]')
+            confirmation_code_2 = self.browser.find_element(By.CSS_SELECTOR,
+                                                            '#mat-dialog-0 > ng-component > bs-dialog > div.body-container > div > bs-code-input > form > div > input:nth-child(4)')
             confirmation_code_2.click()
             confirmation_code_2.send_keys(message.text)
             self.third_code(message)
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            self.homepage(message)
 
     def third_code(self, message):
         """Переводит на функцию ввода 3 цифры кода подтверждения"""
@@ -181,22 +174,19 @@ class BeatstarsBot:
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            time.sleep(random.randrange(5, 10))
-            self.homepage(message)
 
     def third_code_input(self, message):
         """Вводит 3 цифру кода подтверждения"""
 
         try:
-            confirmation_code_3 = self.browser.find_element(By.XPATH,
-                                                            '/html/body/div[2]/div[2]/div/mat-dialog-container/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[5]')
+            confirmation_code_3 = self.browser.find_element(By.CSS_SELECTOR,
+                                                            '#mat-dialog-0 > ng-component > bs-dialog > div.body-container > div > bs-code-input > form > div > input:nth-child(5)')
             confirmation_code_3.click()
             confirmation_code_3.send_keys(message.text)
             self.fourth_code(message)
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            self.homepage(message)
 
     def fourth_code(self, message):
         """Переводит на функцию ввода 4 цифры кода подтверждения"""
@@ -207,15 +197,14 @@ class BeatstarsBot:
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            time.sleep(random.randrange(5, 10))
-            self.homepage(message)
+
 
     def fourth_code_input(self, message):
         """Вводит 4 цифру кода подтверждения"""
 
         try:
-            confirmation_code_4 = self.browser.find_element(By.XPATH,
-                                                            '/html/body/div[2]/div[2]/div/mat-dialog-container/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[6]')
+            confirmation_code_4 = self.browser.find_element(By.CSS_SELECTOR,
+                                                            '#mat-dialog-0 > ng-component > bs-dialog > div.body-container > div > bs-code-input > form > div > input:nth-child(6)')
             confirmation_code_4.click()
             confirmation_code_4.send_keys(message.text)
             bot.send_message(message.chat.id, "Ввёл код подтверждения, дождитесь загрузки браузера")
@@ -224,7 +213,6 @@ class BeatstarsBot:
         except Exception as ex:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
-            self.homepage(message)
 
     def consent_to_cookies(self, message):
         """Нажимает на кнопку 'Согласиться с куки' """
@@ -241,7 +229,7 @@ class BeatstarsBot:
             bot.send_message(message.chat.id, "Не получилось согласиться с куки, пробую еще раз")
             print(ex)
             time.sleep(random.randrange(15, 20))
-            self.consent_to_cookies()
+            self.consent_to_cookies(message)
 
 
     def homepage(self, message):
