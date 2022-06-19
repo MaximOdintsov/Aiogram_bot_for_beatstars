@@ -1,5 +1,4 @@
 import os
-import sys
 
 import telebot
 from selenium import webdriver
@@ -119,12 +118,14 @@ class BeatstarsBot:
             self.oauth_beatstars(message)
 
     def first_code(self, message):
-        """Переводит на функцию ввода первой цифры кода подтверждения"""
+        """Переводит на функцию ввода 1 цифры кода подтверждения"""
 
         try:
             code_1 = bot.send_message(message.chat.id,
                                       'Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если да, то следуй инструкции дальше, если нет, то отправь боту "0"')
             bot.register_next_step_handler(code_1, self.first_code_input)
+            self.first_code_input(message)  #######
+
         except Exception as ex:
             bot.send_message(message.chat.id, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
@@ -132,7 +133,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def first_code_input(self, message):
-        """Вводит первую цифру кода подтверждения"""
+        """Вводит 1 цифру кода подтверждения"""
 
         try:
             bot.send_message(message.chat.id, "Введите первую цифру кода подтверждения")
@@ -148,7 +149,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def second_code(self, message):
-        """Переводит на функцию ввода второй цифры кода подтверждения"""
+        """Переводит на функцию ввода 2 цифры кода подтверждения"""
 
         try:
             code_2 = bot.send_message(message.chat.id, "Введите следующую цифру кода подтверждения!")
@@ -160,7 +161,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def second_code_input(self, message):
-        """Вводит вторую цифру кода подтверждения"""
+        """Вводит 2 цифру кода подтверждения"""
 
         try:
             confirmation_code_2 = self.browser.find_element(By.XPATH,
@@ -174,7 +175,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def third_code(self, message):
-        """Переводит на функцию ввода третьей цифры кода подтверждения"""
+        """Переводит на функцию ввода 3 цифры кода подтверждения"""
 
         try:
             code_3 = bot.send_message(message.chat.id, "Введите следующую цифру кода подтверждения!")
@@ -186,7 +187,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def third_code_input(self, message):
-        """Вводит третью цифру кода подтверждения"""
+        """Вводит 3 цифру кода подтверждения"""
 
         try:
             confirmation_code_3 = self.browser.find_element(By.XPATH,
@@ -200,7 +201,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def fourth_code(self, message):
-        """Переводит на функцию ввода четвёртой цифры кода подтверждения"""
+        """Переводит на функцию ввода 4 цифры кода подтверждения"""
 
         try:
             code_4 = bot.send_message(message.chat.id, "Введите следующую цифру кода подтверждения!")
@@ -212,7 +213,7 @@ class BeatstarsBot:
             self.homepage(message)
 
     def fourth_code_input(self, message):
-        """Вводит четвёртую цифру кода подтверждения"""
+        """Вводит 4 цифру кода подтверждения"""
 
         try:
             confirmation_code_4 = self.browser.find_element(By.XPATH,
@@ -239,7 +240,7 @@ class BeatstarsBot:
             time.sleep(random.randrange(2, 4))
 
         except Exception as ex:
-            bot.send_message(message.chat.id, "Не получилось согласиться с куки, пробую заново!")
+            bot.send_message(message.chat.id, "Не получилось согласиться с куки, пробую ввести код подтверждения!")
             print(ex)
             time.sleep(random.randrange(5, 10))
             self.first_code(message)
@@ -596,6 +597,11 @@ def login(message):
 @bot.message_handler(commands=['start_bot'])  # нажимает на кнопку "Войти"
 def start_bot(message):
     BS_bot.start_bot(message)
+
+
+@bot.message_handler(commands=['code'])  # вводит первую цифру кода подтверждения
+def code(message):
+    BS_bot.first_code(message)
 
 
 @bot.message_handler(content_types=['text'])
