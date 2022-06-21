@@ -22,12 +22,6 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
 
 
-def unrecognized_text(message):
-    """Отвечает на нераспознанную команду"""
-
-    bot.send_message(message.chat.id, "Чо тебе надо??!")
-
-
 class BeatstarsBot:
     """Класс работы бота"""
 
@@ -565,6 +559,12 @@ class BeatstarsBot:
             bot.send_message(message.chat.id, 'Что-то пошло не так, перехожу на начальную страницу гугл, запусти бота заново: /start_bot')
             print(ex)
             self.browser.get('https://google.com/')
+
+
+def unrecognized_text(message):
+    """Отвечает на нераспознанную команду"""
+
+    bot.send_message(message.chat.id, "Что ты хотел?")
 
 
 @bot.message_handler(commands=['start_oauth'])
