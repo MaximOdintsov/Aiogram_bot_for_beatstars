@@ -15,10 +15,17 @@ from comments import list_comments
 from database import *
 
 bot = telebot.TeleBot(TOKEN)
-# server = Flask(__name__)
-#
-# if __name__ == 'main':
-#     server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+app = Flask(__name__)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
+
+def unrecognized_text(message):
+    """Отвечает на нераспознанную команду"""
+
+    bot.send_message(message.chat.id, "Чо тебе надо??!")
 
 
 class BeatstarsBot:
@@ -68,11 +75,6 @@ class BeatstarsBot:
 
         pass_word = bot.send_message(message.chat.id, "Введи пароль")
         bot.register_next_step_handler(pass_word, self.password_input)
-
-    def unrecognized_text(self, message):
-        """Отвечает на нераспознанную команду"""
-
-        bot.send_message(message.chat.id, "Чо тебе надо??!")
 
     def username_input(self, message):
         """Вводит логин"""
@@ -198,7 +200,6 @@ class BeatstarsBot:
             print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации, открываю эту страницу заново')
             print(ex)
 
-
     def fourth_code_input(self, message):
         """Вводит 4 цифру кода подтверждения"""
 
@@ -226,11 +227,10 @@ class BeatstarsBot:
             time.sleep(random.randrange(2, 4))
 
         except Exception as ex:
-            bot.send_message(message.chat.id, "Не получилось согласиться с куки, пробую еще раз")
+            bot.send_message(message.chat.id,
+                             'Не получилось согласиться с куки, попробуйте еще раз через некоторое время')
             print(ex)
             time.sleep(random.randrange(15, 20))
-            self.consent_to_cookies(message)
-
 
     def homepage(self, message):
         """Открывает начальную страницу битстарс"""
@@ -563,6 +563,7 @@ class BeatstarsBot:
                 
         except Exception as ex:
             bot.send_message(message.chat.id, 'Что-то пошло не так, перехожу на начальную страницу гугл, запусти бота заново: /start_bot')
+            print(ex)
             self.browser.get('https://google.com/')
 
 
@@ -608,7 +609,7 @@ def code(message):
 
 @bot.message_handler(content_types=['text'])
 def text(message):
-    BS_bot.unrecognized_text(message)
+    unrecognized_text(message)
 
 
 def username_input(message):  # ввод логина
