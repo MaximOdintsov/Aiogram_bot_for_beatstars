@@ -18,8 +18,9 @@ bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='1.1.1.1', port=port)
+    if __name__ == "__main__":
+        from waitress import serve
+        serve(app, host="0.0.0.0", port=8080)
 
 
 class BeatstarsBot:
