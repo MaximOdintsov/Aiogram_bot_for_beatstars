@@ -16,27 +16,28 @@ import random
 from colorama import Back, Fore
 
 from create_bot import bot, dp
+from venv import register
 from keyboard import *
 from comments import list_comments
 
 
-username = None
-password = None
-code = None
-username_inp = None
-password_inp = None
-code_inp = None
-
-logging.basicConfig(level=logging.INFO)
-
-
-class Form_0(StatesGroup):
-    username_inp = State()
-    password_inp = State()
-
-
-class Form_1(StatesGroup):
-    code_inp = State()
+# username = None
+# password = None
+# code = None
+# username_inp = None
+# password_inp = None
+# code_inp = None
+#
+# logging.basicConfig(level=logging.INFO)
+#
+#
+# class Form_0(StatesGroup):
+#     username_inp = State()
+#     password_inp = State()
+#
+#
+# class Form_1(StatesGroup):
+#     code_inp = State()
 
 
 class BeatstarsBot():
@@ -527,82 +528,84 @@ async def command_start(message: types.Message):
     await bot.send_message(message.from_user.id, "Привет, я бот, помогающий раскрутить твой битстарс аккаунт!", reply_markup=keyboard_start)
 
 
-# начинаем собирать данные для авторизации от пользователя
-@dp.message_handler(commands='start_input_data', state=None)
-async def start_input_data(message: types.Message):
-    await Form_0.username_inp.set()
+# # начинаем собирать данные для авторизации от пользователя
+# @dp.message_handler(commands='start_input_data', state=None)
+# async def start_input_data(message: types.Message):
+#     await Form_0.username_inp.set()
+#
+#
+# # выход из машинных состояний
+# @dp.message_handler(state="*", commands='Отменить запись данных')
+# @dp.message_handler(Text(equals='Отменить запись данных', ignore_case=True), state="*")
+# async def cancel_input_data(message: types.Message, state: FSMContext):
+#     current_state = await state.get_state()
+#     if current_state is None:
+#         return
+#     await state.finish()
+#     await message.reply('Ввод данных отменён!', reply_markup=keyboard_send_data)
+#
+#
+# # ловим имя пользователя и записываем его в словарь
+# @dp.message_handler(state=Form_0.username_inp)
+# async def input_username(message: types.Message, state: FSMContext):
+#     async with state.proxy() as data:
+#         data['username_inp'] = message.text
+#     await Form_0.next()
+#     await message.reply('Теперь введи пароль')
+#
+#
+# # ловим пароль, записываем его в словарь и записываем полученные данные (имя пользователя и пароль) в переменные
+# @dp.message_handler(state=Form_0.password_inp)
+# async def input_password(message: types.Message, state: FSMContext):
+#     global username, password
+#
+#     async with state.proxy() as data:
+#         data['password_inp'] = message.text
+#         username = str(data['username_inp'])
+#         password = str(data['password_inp'])
+#         await bot.send_message(message.from_user.id, 'Отлично, данные для авторизации введены!\nТеперь нажми на "Отправить данные на сайт.\n"'
+#                                                      'Если данные введены неверно, то нажмите на кнопку "Ввести данные авторизации" еще раз.',
+#                                reply_markup=keyboard_send_data)
+#
+#     await state.finish()
+#
+#
+# # запрашиваем от пользователя код подтверждения (входим в машинные состояния)
+# @dp.message_handler(commands='input_code', state=None)
+# async def start_input_code(message: types.Message):
+#     await Form_1.code_inp.set()
+#
+#
+# # выход из машинных состояний
+# @dp.message_handler(state="*", commands='Отменить ввод кода')
+# @dp.message_handler(Text(equals='Отменить ввод кода', ignore_case=True), state="*")
+# async def cancel_input_code(message: types.Message, state: FSMContext):
+#     current_state = await state.get_state()
+#     if current_state is None:
+#         return
+#     await state.finish()
+#     await message.reply("Отправка кода верификации отменена", reply_markup=keyboard_send_code)
+#
+#
+#
+# # ловим код и записываем его в переменную
+# @dp.message_handler(state=Form_1.code_inp)
+# async def input_code(message: types.Message, state: FSMContext):
+#     global code
+#
+#     async with state.proxy() as data:
+#         data['code_inp'] = message.text
+#         code = str(data['code_inp'])
+#     num = len(code)
+#     if num == 4:
+#
+#         await message.reply('Отлично, код записан!\nПроверьте правильность введенных данных\nЕсли код записан верно, то нажми на "Отправить код"\nЕсли код записан неверно, то нажмите "Назад" ',
+#                             reply_markup=keyboard_send_code)
+#         await state.finish()
+#     else:
+#         await message.reply("Введен неверный код!")
+#         await start_input_code(message)
 
-
-# выход из машинных состояний
-@dp.message_handler(state="*", commands='cancel_input_data')
-@dp.message_handler(Text(equals='cancel_input_data', ignore_case=True), state="*")
-async def cancel_input_data(message: types.Message, state: FSMContext):
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-    await state.finish()
-    await message.reply('ОК')
-
-
-# ловим имя пользователя и записываем его в словарь
-@dp.message_handler(state=Form_0.username_inp)
-async def input_username(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['username_inp'] = message.text
-    await Form_0.next()
-    await message.reply('Теперь введи пароль')
-
-
-# ловим пароль, записываем его в словарь и записываем полученные данные (имя пользователя и пароль) в переменные
-@dp.message_handler(state=Form_0.password_inp)
-async def input_password(message: types.Message, state: FSMContext):
-    global username, password
-
-    async with state.proxy() as data:
-        data['password_inp'] = message.text
-        username = str(data['username_inp'])
-        password = str(data['password_inp'])
-        await bot.send_message(message.from_user.id, 'Отлично, данные для авторизации введены!\nТеперь нажми на "Отправить данные на сайт"'
-                                                     'Если данные введены неверно, то нажмите на кнопку "Ввести данные авторизации" еще раз',
-                               reply_markup=keyboard_send_data)
-
-    await state.finish()
-
-
-# запрашиваем от пользователя код подтверждения (входим в машинные состояния)
-@dp.message_handler(commands='input_code', state=None)
-async def start_input_code(message: types.Message):
-    await Form_1.code_inp.set()
-
-
-# выход из машинных состояний
-@dp.message_handler(state="*", commands='cancel_input_code')
-@dp.message_handler(Text(equals='cancel_input_code', ignore_case=True), state="*")
-async def cancel_input_code(message: types.Message, state: FSMContext):
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-    await state.finish()
-    await message.reply('ОК')
-
-
-# ловим код и записываем его в переменную
-@dp.message_handler(state=Form_1.code_inp)
-async def input_code(message: types.Message, state: FSMContext):
-    global code
-
-    async with state.proxy() as data:
-        data['code_inp'] = message.text
-        code = str(data['code_inp'])
-    num = len(code)
-    if num == 4:
-
-        await message.reply('Отлично, код записан!\nПроверьте правильность введенных данных\nЕсли код записан верно, то нажми на "Отправить код"\nЕсли код записан неверно, то нажмите "Назад" ',
-                            reply_markup=keyboard_send_code)
-        await state.finish()
-    else:
-        await message.reply("Введен неверный код!")
-        await start_input_code(message)
 
 
 # отвечает на текст
@@ -626,35 +629,33 @@ async def text(message: types.Message):
         beat_bot.oauth_beatstars(message)
         await bot.send_message(message.from_user.id, "Бот запущен!", reply_markup=keyboard_send_data)
 
-    elif message.text == 'Ввести данные авторизации':
+    elif message.text == 'Ввести данные для авторизации':
         await bot.send_message(message.from_user.id, "Введи имя пользователя", reply_markup=keyboard_input_data)
         await start_input_data(message)
 
     elif message.text == 'Отправить данные на сайт':
+        await message.reply('Идёт отправка данных на сайт...')
         beat_bot.username_input(message)
         beat_bot.password_input(message)
         await message.reply('Отлично! Данные отправлены на сайт!\nТеперь нажми на кнопку "Войти" ')
 
-    elif message.text == 'Отменить запись данных':
-        await cancel_input_data(message)
-        await message.reply('Ввод данных отменён!', reply_markup=keyboard_send_data)
+    # elif message.text == 'Отменить запись данных':
+    #     await cancel_input_data(message)
+    #     await message.reply('Ввод данных отменён!', reply_markup=keyboard_send_data)
 
     elif message.text == 'Войти':
+        await message.reply('Бот нажал на кнопку "Войти", подождите немного...')
         beat_bot.login_button(message)
-        await message.reply('Бот нажал на кнопку "Войти"\nПроверьте почту\nEсли вам пришел код, то жмите на "Ввести код"\nЕсли нет, то жми "Согласиться с куки"', reply_markup=keyboard_code_or_cookie)
+        await message.reply('Проверьте почту\nEсли вам пришел код, то жмите на "Ввести код"\nЕсли нет, то жми "Согласиться с куки"', reply_markup=keyboard_code_or_cookie)
 
     elif message.text == 'Ввести код':
         await message.reply("Введи код подтверждения, пришедший на твою почту", reply_markup=keyboard_input_code)
         await start_input_code(message)
-        await input_code(message)
+
 
     elif message.text == 'Отправить код':
         beat_bot.send_code(message)
         await message.reply("Код отправлен! Теперь нужно согласиться с куки-файлами", reply_markup=keyboard_cookie)
-
-    elif message.text == 'Отменить ввод кода':
-        await cancel_input_code(message)
-        await message.reply("Отправка кода верификации отменена", reply_markup=keyboard_send_code)
 
     elif message.text == 'Согласиться с куки':
         beat_bot.agree_to_cookies(message)

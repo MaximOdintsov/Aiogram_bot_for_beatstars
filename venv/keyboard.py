@@ -5,7 +5,7 @@ bt_again = KeyboardButton('Начать всё заново')
 bt_start = KeyboardButton('Начать авторизацию')
 
 
-bt_input_data = KeyboardButton('Ввести данные авторизации')
+bt_input_data = KeyboardButton('Ввести данные для авторизации')
 bt_send_data = KeyboardButton('Отправить данные на сайт')
 bt_login = KeyboardButton('Войти')
 cansel_input_data = KeyboardButton('Отменить запись данных')
@@ -54,6 +54,10 @@ keyboard_cookie.add(bt_agree_to_cookies).add(bt_back).add(bt_again)
 '''Клавиатура для запуска бота'''
 keyboard_start_bot = ReplyKeyboardMarkup(resize_keyboard=True)
 keyboard_start_bot.add(bt_start_bot).add(bt_stop_bot).insert(bt_again)
+
+'''Клавиатура после запуска бота'''
+keyboard_after_the_start = ReplyKeyboardMarkup(resize_keyboard=True)
+keyboard_after_the_start.add(bt_stop_bot).insert(bt_again)
 
 
 
