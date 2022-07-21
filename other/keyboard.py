@@ -36,7 +36,7 @@ keyboard_send_data.row(bt_input_data, bt_send_data).add(bt_login).row(bt_again)
 
 '''Клавиатура для выбора: либо соглашение с куки, либо ввод кода'''
 keyboard_code_or_cookie = ReplyKeyboardMarkup(resize_keyboard=True)
-keyboard_code_or_cookie.row(bt_input_code, bt_agree_to_cookies).add(bt_back).add(bt_again)
+keyboard_code_or_cookie.row(bt_input_code, bt_agree_to_cookies).add(bt_again)
 
 
 '''Клавиатура для ввода кода'''
@@ -53,12 +53,11 @@ keyboard_cookie.add(bt_agree_to_cookies).add(bt_back).add(bt_again)
 
 '''Клавиатура для запуска бота'''
 keyboard_start_bot = ReplyKeyboardMarkup(resize_keyboard=True)
-keyboard_start_bot.add(bt_start_bot).add(bt_stop_bot).insert(bt_again)
+keyboard_start_bot.add(bt_start_bot).add(bt_again)
 
 '''Клавиатура после запуска бота'''
 keyboard_after_the_start = ReplyKeyboardMarkup(resize_keyboard=True)
-keyboard_after_the_start.add(bt_stop_bot).insert(bt_again)
-
+keyboard_after_the_start.add(bt_stop_bot).add(bt_again)
 
 
 

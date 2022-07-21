@@ -16,28 +16,30 @@ import random
 from colorama import Back, Fore
 
 from create_bot import bot, dp
-from venv import register
-from keyboard import *
-from comments import list_comments
+from other.keyboard import *
+from other.comments import list_comments
+
+username = None
+password = None
+code = None
+username_inp = None
+password_inp = None
+code_inp = None
+
+agree = None
+find_element = None
+login_attempts = None
+
+logging.basicConfig(level=logging.INFO)
 
 
-# username = None
-# password = None
-# code = None
-# username_inp = None
-# password_inp = None
-# code_inp = None
-#
-# logging.basicConfig(level=logging.INFO)
-#
-#
-# class Form_0(StatesGroup):
-#     username_inp = State()
-#     password_inp = State()
-#
-#
-# class Form_1(StatesGroup):
-#     code_inp = State()
+class Form_0(StatesGroup):
+    username_inp = State()
+    password_inp = State()
+
+
+class Form_1(StatesGroup):
+    code_inp = State()
 
 
 class BeatstarsBot():
@@ -70,35 +72,48 @@ class BeatstarsBot():
             time.sleep(random.randrange(5, 15))
 
         except Exception as ex:
-            bot.send_message(message.from_user.id, 'Не получилось открыть битстарс, запускаю авторизацию заново')
             print('Не получилось открыть битстарс, запускаю авторизацию заново')
             print(Fore.RED, 'Описание ошибки: ', ex)
             time.sleep(random.randrange(5, 10))
-            self.oauth_beatstars()
+            self.oauth_beatstars(message)
 
 
     def username_input(self, message):
         """Вводит логин"""
+        try:
+            username_input = self.browser.find_element(By.XPATH, '/html/body/oauth-root/ng-component/section/div[2]/div[2]/form/div[1]/bs-text-input/input')
+            username_input.click()
+            time.sleep(random.randrange(2, 5))
+            username_input.clear()
+            username_input.send_keys(username)
 
-        username_input = self.browser.find_element(By.XPATH, '/html/body/oauth-root/ng-component/section/div[2]/div[2]/form/div[1]/bs-text-input/input')
-        username_input.click()
-        time.sleep(random.randrange(2, 5))
-        username_input.clear()
-        username_input.send_keys(username)
+            bot.send_message(message.from_user.id, "Бот ввёл имя пользователя!")
+            time.sleep(random.randrange(2, 4))
 
-        bot.send_message(message.from_user.id, "Бот ввёл имя пользователя!")
-        time.sleep(random.randrange(1, 3))
+        except Exception as ex:
+            print('Не получилось ввести логин, запускаю авторизацию заново')
+            print(Fore.RED, 'Описание ошибки: ', ex)
+            time.sleep(random.randrange(5, 10))
+            self.username_input(message)
 
     def password_input(self, message):
         """Вводит пароль"""
-        password_input = self.browser.find_element(By.XPATH, '/html/body/oauth-root/ng-component/section/div[2]/div[2]/form/div[2]/bs-text-input/input')
-        password_input.click()
-        time.sleep(random.randrange(2, 5))
-        password_input.clear()
-        password_input.send_keys(password)
 
-        bot.send_message(message.from_user.id, "Бот ввёл пароль!")
-        time.sleep(random.randrange(1, 3))
+        try:
+            password_input = self.browser.find_element(By.XPATH, '/html/body/oauth-root/ng-component/section/div[2]/div[2]/form/div[2]/bs-text-input/input')
+            password_input.click()
+            time.sleep(random.randrange(2, 5))
+            password_input.clear()
+            password_input.send_keys(password)
+
+            bot.send_message(message.from_user.id, "Бот ввёл пароль!")
+            time.sleep(random.randrange(1, 3))
+
+        except Exception as ex:
+            print('Не получилось ввести пароль, запускаю авторизацию заново')
+            print(Fore.RED, 'Описание ошибки: ', ex)
+            time.sleep(random.randrange(5, 10))
+            self.password_input(message)
 
     def login_button(self, message):
         """Нажимает на кнопку 'Войти' """
@@ -109,8 +124,12 @@ class BeatstarsBot():
             login_button.click()
             bot.send_message(message.from_user.id, "Нажал на кнопку войти. Пожалуйста, подождите...")
             time.sleep(random.randrange(20, 30))
+
+            # проверка, можно ли войти на сайт
+            self.many_login_attempts()
             bot.send_message(message.from_user.id,
                              "Посмотри, пришло ли тебе письмо с кодом подтверждения на почту, если да, то вводи код подтверждения, если нет, то соглашайся с куки")
+
         except Exception as ex:
             bot.send_message(message.from_user.id, 'Не получилось нажать на кнопку "Войти", запускаю алгоритм заново')
             print('Не получилось нажать на кнопку "Войти", запускаю алгоритм заново')
@@ -118,7 +137,21 @@ class BeatstarsBot():
             time.sleep(random.randrange(5, 10))
             self.oauth_beatstars(message)
 
-    def send_code(self, message):
+    def many_login_attempts(self):
+        """Проверяет, не было ли слишком много попыток входа"""
+
+        global login_attempts
+        try:
+            login_attempts = None
+            self.browser.find_element(By.XPATH,
+                                      '/html/body/div[2]/div/div/snack-bar-container/div/div/bs-custom-snackbar/div/button')
+            print('Слишком много недействительных попыток входа!')
+
+        except:
+            login_attempts = 1
+
+    def send_code(self):
+        """Отправляет код подтверждения"""
 
         try:
             code_1 = self.browser.find_element(By.XPATH, '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
@@ -136,43 +169,39 @@ class BeatstarsBot():
             code_4 = self.browser.find_element(By.XPATH, '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[6]')
             code_4.click()
             code_4.send_keys(code[3])
+            self.find_elements_for_code()
 
         except Exception as ex:
-            bot.send_message(message.from_user.id, 'Не получилось ввести код верификации')
-            print(Fore.RED, 'Описание ошибки: ', ex)
+            print(Fore.RED, ex)
+
+    def find_elements_for_code(self):
+        """Находит элемент на сайте, чтобы подтвердить, что код верификации введен верно"""
+
+        global find_element
+        try:
+            self.browser.find_element(By.XPATH,
+                                      '/html/body/mp-root/mp-snackbar-info-messages/div/mp-cookies-snackbar/mp-snackbar-info-message-template/div/button')
+            find_element = 1
+
+        except Exception as ex:
+            find_element = None
+            print('Не получилось ввести код верификации')
+            print(ex)
 
     def agree_to_cookies(self, message):
         """Нажимает на кнопку 'Согласиться с куки' """
 
+        global agree
         try:
             cookie_consent = self.browser.find_element(By.XPATH,
                                                        '/html/body/mp-root/mp-snackbar-info-messages/div/mp-cookies-snackbar/mp-snackbar-info-message-template/div/button')
             cookie_consent.click()
-            time.sleep(random.randrange(2, 4))
+            agree = 1
 
         except Exception as ex:
-            bot.send_message(message.from_user.id,
-                             'Не получилось согласиться с куки, попробуйте еще раз через некоторое время')
+            agree = None
             print(Fore.RED, 'Не получилось согласиться с куки, попробуйте еще раз через некоторое время')
             print(Fore.RED, 'Описание ошибки: ', ex)
-            time.sleep(random.randrange(10, 15))
-            self.homepage(message)
-
-    def homepage(self, message):
-        """Открывает начальную страницу битстарс"""
-
-        try:
-            self.browser.get('https://beatstars.com/')
-            bot.send_message(message.from_user.id, 'Открыл начальную страницу, т.к. не получилось согласиться с куки')
-            time.sleep(random.randrange(5, 15))
-
-            self.agree_to_cookies(message)
-        except Exception as ex:
-            bot.send_message(message.from_user.id, 'Снова не получилось согласиться с куки, запускаю алгоритм заново')
-            print('Снова не получилось согласиться с куки, запускаю алгоритм заново')
-            print(Fore.RED, 'Описание ошибки: ', ex)
-            time.sleep(random.randrange(5, 10))
-            self.homepage(message)
 
     def open_feed(self, message):
         """Открывает фид"""
@@ -428,6 +457,7 @@ class BeatstarsBot():
 
     def repost_beat(self, message):
         """Делает репост моих битов"""
+
         try:
             self.browser.get('https://www.beatstars.com/flipsidebeats/tracks')
             time.sleep(random.randrange(30, 40))
@@ -461,6 +491,8 @@ class BeatstarsBot():
             time.sleep(10)
 
     def stop_bot(self):
+        """Полностью закрывает браузер"""
+
         self.browser.quit()
         print('Бот закрыл браузер')
 
@@ -528,84 +560,84 @@ async def command_start(message: types.Message):
     await bot.send_message(message.from_user.id, "Привет, я бот, помогающий раскрутить твой битстарс аккаунт!", reply_markup=keyboard_start)
 
 
-# # начинаем собирать данные для авторизации от пользователя
-# @dp.message_handler(commands='start_input_data', state=None)
-# async def start_input_data(message: types.Message):
-#     await Form_0.username_inp.set()
-#
-#
-# # выход из машинных состояний
-# @dp.message_handler(state="*", commands='Отменить запись данных')
-# @dp.message_handler(Text(equals='Отменить запись данных', ignore_case=True), state="*")
-# async def cancel_input_data(message: types.Message, state: FSMContext):
-#     current_state = await state.get_state()
-#     if current_state is None:
-#         return
-#     await state.finish()
-#     await message.reply('Ввод данных отменён!', reply_markup=keyboard_send_data)
-#
-#
-# # ловим имя пользователя и записываем его в словарь
-# @dp.message_handler(state=Form_0.username_inp)
-# async def input_username(message: types.Message, state: FSMContext):
-#     async with state.proxy() as data:
-#         data['username_inp'] = message.text
-#     await Form_0.next()
-#     await message.reply('Теперь введи пароль')
-#
-#
-# # ловим пароль, записываем его в словарь и записываем полученные данные (имя пользователя и пароль) в переменные
-# @dp.message_handler(state=Form_0.password_inp)
-# async def input_password(message: types.Message, state: FSMContext):
-#     global username, password
-#
-#     async with state.proxy() as data:
-#         data['password_inp'] = message.text
-#         username = str(data['username_inp'])
-#         password = str(data['password_inp'])
-#         await bot.send_message(message.from_user.id, 'Отлично, данные для авторизации введены!\nТеперь нажми на "Отправить данные на сайт.\n"'
-#                                                      'Если данные введены неверно, то нажмите на кнопку "Ввести данные авторизации" еще раз.',
-#                                reply_markup=keyboard_send_data)
-#
-#     await state.finish()
-#
-#
-# # запрашиваем от пользователя код подтверждения (входим в машинные состояния)
-# @dp.message_handler(commands='input_code', state=None)
-# async def start_input_code(message: types.Message):
-#     await Form_1.code_inp.set()
-#
-#
-# # выход из машинных состояний
-# @dp.message_handler(state="*", commands='Отменить ввод кода')
-# @dp.message_handler(Text(equals='Отменить ввод кода', ignore_case=True), state="*")
-# async def cancel_input_code(message: types.Message, state: FSMContext):
-#     current_state = await state.get_state()
-#     if current_state is None:
-#         return
-#     await state.finish()
-#     await message.reply("Отправка кода верификации отменена", reply_markup=keyboard_send_code)
-#
-#
-#
-# # ловим код и записываем его в переменную
-# @dp.message_handler(state=Form_1.code_inp)
-# async def input_code(message: types.Message, state: FSMContext):
-#     global code
-#
-#     async with state.proxy() as data:
-#         data['code_inp'] = message.text
-#         code = str(data['code_inp'])
-#     num = len(code)
-#     if num == 4:
-#
-#         await message.reply('Отлично, код записан!\nПроверьте правильность введенных данных\nЕсли код записан верно, то нажми на "Отправить код"\nЕсли код записан неверно, то нажмите "Назад" ',
-#                             reply_markup=keyboard_send_code)
-#         await state.finish()
-#     else:
-#         await message.reply("Введен неверный код!")
-#         await start_input_code(message)
+# начинаем собирать данные для авторизации от пользователя
+@dp.message_handler(commands='start_input_data', state=None)
+async def start_input_data(message: types.Message):
+    await Form_0.username_inp.set()
 
+
+# выход из машинных состояний
+@dp.message_handler(state="*", commands='Отменить запись данных')
+@dp.message_handler(Text(equals='Отменить запись данных', ignore_case=True), state="*")
+async def cancel_input_data(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await message.reply('Ввод данных отменён!', reply_markup=keyboard_send_data)
+
+
+# ловим имя пользователя и записываем его в словарь
+@dp.message_handler(state=Form_0.username_inp)
+async def input_username(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['username_inp'] = message.text
+    await Form_0.next()
+    await message.reply('Теперь введи пароль')
+
+
+# ловим пароль, записываем его в словарь и записываем полученные данные (имя пользователя и пароль) в переменные
+@dp.message_handler(state=Form_0.password_inp)
+async def input_password(message: types.Message, state: FSMContext):
+    global username, password
+
+    async with state.proxy() as data:
+        data['password_inp'] = message.text
+        username = str(data['username_inp'])
+        password = str(data['password_inp'])
+        await bot.send_message(message.from_user.id, 'Отлично, данные для авторизации введены!\nТеперь нажми на "Отправить данные на сайт.\n'
+                                                     'Если данные введены неверно, то нажмите на кнопку "Ввести данные авторизации" еще раз.',
+                               reply_markup=keyboard_send_data)
+
+    await state.finish()
+
+
+# запрашиваем от пользователя код подтверждения (входим в машинные состояния)
+@dp.message_handler(commands='input_code', state=None)
+async def start_input_code(message: types.Message):
+    await Form_1.code_inp.set()
+
+
+# выход из машинных состояний
+@dp.message_handler(state="*", commands='Отменить ввод кода')
+@dp.message_handler(Text(equals='Отменить ввод кода', ignore_case=True), state="*")
+async def cancel_input_code(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await message.reply("Отправка кода верификации отменена", reply_markup=keyboard_send_code)
+
+
+
+# ловим код и записываем его в переменную
+@dp.message_handler(state=Form_1.code_inp)
+async def input_code(message: types.Message, state: FSMContext):
+    global code
+
+    async with state.proxy() as data:
+        data['code_inp'] = message.text
+        code = str(data['code_inp'])
+    num = len(code)
+    # проверяем, правильное ли количество символов ввел пользователь, если да, то завершаем процесс ввода, если нет, то перенаправляем на ввод кода заново
+    if num == 4:
+
+        await message.reply('Отлично, код записан!\nПроверьте правильность введенных данных\nЕсли код записан верно, то нажми на "Отправить код"\nЕсли код записан неверно, то нажмите "Назад" ',
+                            reply_markup=keyboard_send_code)
+        await state.finish()
+    else:
+        await message.reply("Введен неверный код! Введите заново.")
+        await start_input_code(message)
 
 
 # отвечает на текст
@@ -644,9 +676,15 @@ async def text(message: types.Message):
     #     await message.reply('Ввод данных отменён!', reply_markup=keyboard_send_data)
 
     elif message.text == 'Войти':
+        '''Нажимает на кнопку войти и проверяет, не было ли слишком много попыток входа'''
+
         await message.reply('Бот нажал на кнопку "Войти", подождите немного...')
         beat_bot.login_button(message)
-        await message.reply('Проверьте почту\nEсли вам пришел код, то жмите на "Ввести код"\nЕсли нет, то жми "Согласиться с куки"', reply_markup=keyboard_code_or_cookie)
+
+        if login_attempts == 1:
+            await bot.send_message(message.from_user.id, 'Проверьте почту\nEсли вам пришел код, то жмите на "Ввести код"\nЕсли нет, то жми "Согласиться с куки"', reply_markup=keyboard_code_or_cookie)
+        else:
+            await bot.send_message(message.from_user.id, 'Было произведено слишком много попыток входа, попробуйте еще раз позже', reply_markup=keyboard_send_data)
 
     elif message.text == 'Ввести код':
         await message.reply("Введи код подтверждения, пришедший на твою почту", reply_markup=keyboard_input_code)
@@ -654,12 +692,26 @@ async def text(message: types.Message):
 
 
     elif message.text == 'Отправить код':
-        beat_bot.send_code(message)
-        await message.reply("Код отправлен! Теперь нужно согласиться с куки-файлами", reply_markup=keyboard_cookie)
+        '''Проводит проверку, есть ли этот элемент на сайте, если да, то отправляет код, если нет, то отправляет обратно'''
+
+        beat_bot.send_code()
+
+        if find_element == 1:
+            await message.reply("Код отправлен! Теперь нужно согласиться с куки-файлами", reply_markup=keyboard_cookie)
+        else:
+            await message.reply('Код не отправлен, нажмите на кнопку "Войти" заново и введите правильный код верификации!', reply_markup=keyboard_send_data)
 
     elif message.text == 'Согласиться с куки':
+        '''Проводит проверку, есть ли этот элемент на сайте, если да, то соглашается с куки, если нет, то отправляет обратно'''
+
         beat_bot.agree_to_cookies(message)
-        await message.reply("Бот согласился с куки!", reply_markup=keyboard_start_bot)
+
+        if agree == 1:
+            await message.reply("Бот согласился с куки!", reply_markup=keyboard_start_bot)
+        else:
+            await message.reply('Не получилось согласиться с куки!\n'
+                                'Еще раз проверьте свою почту, если пришел код, то нажмите на "Ввести код"\n'
+                                'Если кода нет, то попробуйте согласиться с куки позднее', reply_markup=keyboard_code_or_cookie)
 
     elif message.text == 'Запустить бота':
         beat_bot.start_bot(message)
