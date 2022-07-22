@@ -129,47 +129,69 @@ class BeatstarsBot:
             print(Fore.RED, 'Описание ошибки: ', ex)
             time.sleep(random.randrange(5, 10))
 
-    def send_code(self):
-        """Отправляет код подтверждения"""
+    def code_review(self):
+        """Проверяет, есть ли меню ввода кода"""
 
         global sent_code
 
         try:
-            time.sleep(random.randrange(15, 25))
             self.browser.find_element(By.XPATH,
                                       '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
-            sent_code = 'yes'
+            sent_code = 1
+            print(Fore.LIGHTYELLOW_EX, 'Нужно ввести код авторизации')
+
+        except Exception as ex:
 
             try:
-                code_1 = self.browser.find_element(By.XPATH,
-                                                   '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
-                code_1.click()
-                code_1.send_keys(code[0])
-
-                code_2 = self.browser.find_element(By.XPATH,
-                                                   '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[4]')
-                code_2.click()
-                code_2.send_keys(code[1])
-
-                code_3 = self.browser.find_element(By.XPATH,
-                                                   '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[5]')
-                code_3.click()
-                code_3.send_keys(code[2])
-
-                code_4 = self.browser.find_element(By.XPATH,
-                                                   '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[6]')
-                code_4.click()
-                code_4.send_keys(code[3])
-                time.sleep(random.randrange(35, 45))
-                self.find_elements_for_code()
-
+                time.sleep(random.randrange(30, 35))
+                self.browser.find_element(By.XPATH,
+                                          '/html/body/mp-root/mp-snackbar-info-messages/div/mp-cookies-snackbar/mp-snackbar-info-message-template/div/button')
+                sent_code = 2
+                print(Fore.LIGHTYELLOW_EX, 'Нужно согласиться с куки')
             except Exception as ex:
-                print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации')
-                print(Fore.RED, 'Описание ошибки: ', ex)
+                sent_code = None
+                print(Fore.LIGHTRED_EX, 'Что-то введено неверно, либо было слишком много попыток входа')
 
-        except:
-            sent_code = 'not'
-            self.agree_to_cookies()
+        # try:
+        #     time.sleep(random.randrange(5, 7))
+        #     self.browser.find_element(By.XPATH,
+        #                               '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
+        #     sent_code = 1
+        #     print('Нужно ввести код авторизации')
+        #
+        # except:
+        #     sent_code = 2
+        #     print('Нужно согласиться с куки')
+
+    def send_code(self):
+        """Отправляет код подтверждения"""
+
+        try:
+            code_1 = self.browser.find_element(By.XPATH,
+                                               '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[3]')
+            code_1.click()
+            code_1.send_keys(code[0])
+
+            code_2 = self.browser.find_element(By.XPATH,
+                                               '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[4]')
+            code_2.click()
+            code_2.send_keys(code[1])
+
+            code_3 = self.browser.find_element(By.XPATH,
+                                               '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[5]')
+            code_3.click()
+            code_3.send_keys(code[2])
+
+            code_4 = self.browser.find_element(By.XPATH,
+                                               '//*[@id="mat-dialog-0"]/ng-component/bs-dialog/div[2]/div/bs-code-input/form/div/input[6]')
+            code_4.click()
+            code_4.send_keys(code[3])
+            time.sleep(random.randrange(35, 45))
+            self.find_elements_for_code()
+
+        except Exception as ex:
+            print(Fore.LIGHTRED_EX, 'Не получилось ввести код верификации')
+            print(Fore.RED, 'Описание ошибки: ', ex)
 
     def find_elements_for_code(self):
         """Находит элемент на сайте, чтобы подтвердить, что код верификации введен верно"""
@@ -183,7 +205,6 @@ class BeatstarsBot:
         except Exception as ex:
             find_element = None
             print(Fore.LIGHTRED_EX, 'Введен неверный код верификации')
-            print(Fore.RED, 'Описание ошибки: ', ex)
 
     def agree_to_cookies(self):
         """Нажимает на кнопку 'Согласиться с куки' """
@@ -650,7 +671,10 @@ async def input_code(message: types.Message, state: FSMContext):
     # проверяем, правильное ли количество символов ввел пользователь, если да, то завершаем процесс ввода, если нет, то перенаправляем на ввод кода заново
     if num == 4:
 
-        await message.reply('Отлично, код записан!\nПроверьте правильность введенных данных\nЕсли код записан верно, то нажми на "Отправить код"\nЕсли код записан неверно, то нажмите "Назад" ',
+        await message.reply('Отлично, код записан!\n'
+                            'Проверьте правильность введенных данных\n'
+                            'Если код записан верно, то нажми на "Отправить код"\n'
+                            'Если код записан неверно, то нажмите "Ввести код" заново',
                             reply_markup=keyboard_send_code)
         await state.finish()
     else:
@@ -668,9 +692,6 @@ async def text(message: types.Message):
         beat_bot.stop_bot()
         await message.reply("Бот полностью остановлен!", reply_markup=keyboard_start)
 
-    elif message.text == 'Назад':
-        await message.reply('Вернулся назад!', reply_markup=keyboard_code_or_cookie)
-
     elif message.text == 'Начать всё заново':
         await message.reply("Начинаем всё заново!", reply_markup=keyboard_start)
 
@@ -687,32 +708,50 @@ async def text(message: types.Message):
         await message.reply('Идёт отправка данных на сайт...')
         beat_bot.username_input()
         beat_bot.password_input()
-        await bot.send_message(message.from_user.id, 'Отлично! Данные отправлены на сайт!\nТеперь нажми на кнопку "Войти" ')
+        await bot.send_message(message.from_user.id, 'Отлично! Данные отправлены на сайт!\n'
+                                                     'Теперь нажми на кнопку "Войти" ')
 
     elif message.text == 'Войти':
         '''Нажимает на кнопку войти и проверяет, не было ли слишком много попыток входа'''
 
+        global sent_code
+
         await message.reply('Бот нажал на кнопку "Войти", подождите немного...')
-        beat_bot.login_button()
+        beat_bot.login_button()  # нажимает на кнопку "Войти"
+        beat_bot.code_review()  # проверяет, появилось ли меню с вводом кода
 
-        if sent_code == 'yes':
-            await bot.send_message(message.from_user.id, 'Проверьте почту\nEсли вам пришел код, то жмите на "Ввести код"\nЕсли нет, то жми "Согласиться с куки"', reply_markup=keyboard_code_or_cookie)
-        elif sent_code == 'not':
+        if sent_code == 1:
+            await bot.send_message(message.from_user.id, 'Проверьте почту\nВам должен был прийти код подтверждения\n'
+                                                         'Нажмите "Ввести код" ', reply_markup=keyboard_send_code)
+            sent_code = None
 
+        elif sent_code == 2:
+            await bot.send_message(message.from_user.id, 'Согласитесь с куки', reply_markup=keyboard_cookie)
+            sent_code = None
+
+        else:
+            await bot.send_message(message.from_user.id, 'Не получилось войти, проверьте правильность введенных данных\n'
+                                                         'Либо повторите попытку входа позже', reply_markup=keyboard_start)
+            sent_code = None
 
     elif message.text == 'Ввести код':
-        await message.reply("Введи код подтверждения, пришедший на твою почту", reply_markup=keyboard_input_code)
-        await start_input_code(message)
+        await message.reply("Введи код подтверждения, пришедший на твою почту",
+                            reply_markup=keyboard_input_code)
+        await start_input_code()
 
     elif message.text == 'Отправить код':
         '''Проводит проверку, есть ли этот элемент на сайте, если да, то отправляет код, если нет, то отправляет обратно'''
 
+        await message.reply("Код отправлен на сайт, подождите немного...")
         beat_bot.send_code()
 
         if find_element == 1:
-            await message.reply("Код отправлен! Теперь нужно согласиться с куки-файлами", reply_markup=keyboard_cookie)
+            await bot.send_message(message.from_user.id, "Код отправлен! Теперь нужно согласиться с куки-файлами",
+                                   reply_markup=keyboard_cookie)
         else:
-            await message.reply('Код не отправлен, нажмите на кнопку "Войти" заново и введите правильный код верификации!', reply_markup=keyboard_send_data)
+            await bot.send_message(message.from_user.id, 'Код не отправлен, нажмите на кнопку "Войти" заново '
+                                                         'и введите правильный код верификации!',
+                                   reply_markup=keyboard_send_data)
 
     elif message.text == 'Согласиться с куки':
         '''Проводит проверку, есть ли этот элемент на сайте, если да, то соглашается с куки, если нет, то отправляет обратно'''
@@ -723,17 +762,17 @@ async def text(message: types.Message):
             await message.reply("Бот согласился с куки!", reply_markup=keyboard_start_bot)
         else:
             await message.reply('Не получилось согласиться с куки!\n'
-                                'Еще раз проверьте свою почту, если пришел код, то нажмите на "Ввести код"\n'
-                                'Если кода нет, то попробуйте согласиться с куки позднее', reply_markup=keyboard_code_or_cookie)
+                                'Попробуйте еще раз', reply_markup=keyboard_cookie)
 
     elif message.text == 'Запустить бота':
+        await message.reply("Бот запущен, можешь отдохнуть 😉",
+                            reply_markup=keyboard_start_bot)
         beat_bot.start_bot()
-        await message.reply("Бот запущен, можешь отдохнуть 😉", reply_markup=keyboard_start_bot)
 
     elif message.text == 'Запустить бота + репост твоих битов':
-        await message.reply(
-            'Бот запущен, сейчас он будет репостить твои биты\nА потом начнет слушать, комментировать, лайкать чужие биты\n'
-            'А также, он будет подписываться на других пользователей! 😉')
+        await message.reply('Бот запущен, сейчас он будет репостить твои биты\n'
+                            'Потом начнет слушать, комментировать, лайкать чужие биты\n'
+                            'А также, он будет подписываться на других пользователей! 😉')
         beat_bot.start_bot_with_reposts()
 
     elif message.text == 'Остановить бота':
@@ -749,4 +788,5 @@ if __name__ == '__main__':
         executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
     except Exception as ex:
-        print(Fore.RED, ex)
+        print(Fore.LIGHTRED_EX, 'Произошла критическая ошибка')
+        print(Fore.RED, 'Описание ошибки: ', ex)
